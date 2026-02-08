@@ -75,7 +75,7 @@ class APIHealthChecker:
         try:
             headers = {"Authorization": f"Bearer {GROQ_API_KEY}"}
             payload = {
-                "model": "mixtral-8x7b-32768",
+                "model": "llama-3.3-70b-versatile",
                 "messages": [{"role": "user", "content": "ok"}],
                 "max_tokens": 5
             }
