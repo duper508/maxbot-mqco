@@ -24,21 +24,19 @@ python3 "$SCRIPT_DIR/api_health_check.py" > "$REPORT_FILE"
 # Extract status for Discord message
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
-# Send to Discord via Clawdbot message tool
-clawdbot message send \
-  --channel discord \
-  --target 1468016334121074721 \
-  --message "🔍 API Health Check - $TIMESTAMP
+# Extract status counts and write to summary file
+OPERATING=$(grep -o "status-ok" "$REPORT_FILE" | wc -l)
+FAILED=$(grep -o "status-fail" "$REPORT_FILE" | wc -l)
 
-✅ Vercel AI Gateway - Working | Balance: \$97.17
-✅ Groq - Working | Free tier
-✅ Brave Search - Working
-✅ ElevenLabs - Working | Usage: 437/10000 chars
-❌ Google APIs - Failed | Invalid key
+SUMMARY_FILE="/tmp/api_health_reports/latest_summary.txt"
+cat > "$SUMMARY_FILE" << SUMMARY
+TIMESTAMP=$TIMESTAMP
+OPERATING=$OPERATING
+FAILED=$FAILED
+REPORT_FILE=$REPORT_FILE
+SUMMARY
 
-Overall: 4/5 operational ⚠️
-
-Full report: $REPORT_FILE" 2>/dev/null || echo "Failed to send to Discord (Clawdbot may not be running)"
+echo "Health check report ready at $REPORT_FILE"
 
 # Keep reports for 7 days
 find "$REPORT_DIR" -type f -name "*.html" -mtime +7 -delete
